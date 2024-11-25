@@ -66,6 +66,7 @@ const AssignmentForm = () => {
     reviewStatus: false,
     postCollabComments: '',
     amountPaidStatus: false,
+    collab_status:""
   });
 
   useEffect(() => {
@@ -90,6 +91,7 @@ const AssignmentForm = () => {
         reviewStatus: assignment?.all_status?.review_status || false,
         postCollabComments: assignment?.post_collab_comments || '',
         amountPaidStatus: assignment?.amount_paid_status || false,
+        collab_status: assignment?.collab_status || "",
       });
     }
   }, [assignmentState]);
@@ -136,6 +138,7 @@ const AssignmentForm = () => {
       deal_amount_for_collab: parseFloat(formData.dealAmount) || 0,
       amount_paid_status: formData.amountPaidStatus || false,
       post_collab_comments: formData.postCollabComments,
+      collab_status: formData.collab_status || '',
     };
     console.log("payload here wtf",payload)
 
@@ -241,7 +244,7 @@ const AssignmentForm = () => {
                   name="visitStatus"
                 />
               }
-              label="Visit Status"
+              label="Visited"
             />
           </Grid>
 
@@ -252,6 +255,7 @@ const AssignmentForm = () => {
                   checked={formData.videoUploadStatus}
                   onChange={handleStatusChange}
                   name="videoUploadStatus"
+                  disabled={!formData.visitStatus}
                 />
               }
               label="Video Upload Status"
@@ -265,6 +269,7 @@ const AssignmentForm = () => {
                   checked={formData.reviewStatus}
                   onChange={handleStatusChange}
                   name="reviewStatus"
+                  disabled={!formData.visitStatus}
                 />
               }
               label="Review Status"
@@ -296,6 +301,17 @@ const AssignmentForm = () => {
               label="Amount Paid Status"
             />
           </Grid>
+          <Grid item xs={6}>
+              <FormControl fullWidth >
+                <InputLabel>Collabaration Status</InputLabel>
+                
+                <Select name="collab_status" value={formData.collab_status} onChange={handleInputChange} label="Collabaration Status">
+                  <MenuItem value="Completed">Completed</MenuItem>
+                  <MenuItem value="Pending">Pending</MenuItem>
+                  
+                </Select>
+              </FormControl>
+            </Grid>
         </Grid>
 
         <StyledButton fullWidth onClick={handleSubmit}>

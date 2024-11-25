@@ -13,7 +13,7 @@ import Button from '@mui/material/Button';
 import EditIcon from '@mui/icons-material/Edit'; // Import Edit icon
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchallInfluencers, selectInfluencerState } from "../../api/influencers";
+import { fetchallInfluencers, selectInfluencerState,deleteinfluencer } from "../../api/influencers";
 
 const columns = [
   { id: 'name', label: 'Influencer Name', minWidth: 170 },
@@ -56,6 +56,12 @@ function InfluencerTable() {
     navigate(`/influencers/edit/${id}`);
   };
 
+  const handleDeleteClick = (id)=>{
+    console.log("Deleting will be done of this id",id)
+    dispatch(deleteinfluencer(id));
+    window.location.reload()
+  } 
+
   useEffect(() => {
     dispatch(fetchallInfluencers());
   }, [dispatch]);
@@ -90,7 +96,7 @@ function InfluencerTable() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {influencer.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
+                {influencer?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)?.map((row) => (
                   <TableRow
                     hover
                     role="checkbox"
@@ -99,7 +105,7 @@ function InfluencerTable() {
                     onClick={() => handleRowClick(row._id)}
                     style={{ cursor: 'pointer' }}
                   >
-                    {columns.map((column) => {
+                    {columns?.map((column) => {
                       const value = row[column.id];
                       return (
                         <TableCell key={column.id} align={column.align}>
@@ -140,12 +146,26 @@ function InfluencerTable() {
                               >
                                 <EditIcon fontSize="small" />
                               </Button>
+                              <Button
+                                variant="contained"
+                                color="secondary"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteClick(row._id);
+                                }}
+
+                                size="small"
+                                sx={{marginLeft:"5px"}}
+                              >
+                                Delete
+                              </Button>
                             </>
                           ) : column.format && typeof value === 'number' ? (
                             column.format(value)
                           ) : (
                             value
                           )}
+
                         </TableCell>
                       );
                     })}

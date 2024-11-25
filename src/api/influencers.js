@@ -39,6 +39,13 @@ export const influencerslice = createSlice({
             state.loading = false;
             state.error = null;
         },
+        deleteHotelSuccess:(state,{payload})=>{
+            state.influencer.push(payload);
+            state.loading = false;
+            state.error = null;
+         
+
+        }
     },
 });
 
@@ -49,6 +56,7 @@ export const {
     getexistInfluencerSuccess,
     getInfluencerFailure,
     createInfluencerSuccess,
+    deleteHotelSuccess
 } = influencerslice.actions;
 
 export const selectInfluencerState = (state) => state.influencer;
@@ -105,3 +113,19 @@ export const updateInfluencer = (id,influencerData) => async (dispatch) => {
         dispatch(getInfluencerFailure(error.message));
     }
 };
+
+
+export const deleteinfluencer = (id)=>async (dispatch)=>{
+    console.log("delete function of influencer trigerred in redux part of the hotel");
+    dispatch(getInfluencer())
+  
+    try{
+  const data = await axios.delete(`${keyUri.BACKEND_URI}/deleteinfluencer/${id}`,config);
+  dispatch(deleteHotelSuccess(data));
+  
+    }
+    catch(error){
+      dispatch(getInfluencerFailure(error.message));
+    }
+  }
+  

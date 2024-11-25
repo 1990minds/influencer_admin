@@ -1,4 +1,6 @@
 import React from 'react';
+import { GridOverlay } from "@mui/x-data-grid";
+
 import { Container, Grid, Paper, Typography, Box } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
@@ -72,6 +74,13 @@ const Dashboard = () => {
       </span>
     ), },
   ];
+  const CustomNoRowsOverlay = () => (
+    <GridOverlay>
+      <Typography variant="h6" color="textSecondary">
+        No assignments available for today.
+      </Typography>
+    </GridOverlay>
+  );
 
   return (
     <Container>
@@ -148,6 +157,9 @@ const Dashboard = () => {
             columns={columns}
             pageSize={5}
             rowsPerPageOptions={[5]}
+            components={{
+              NoRowsOverlay: CustomNoRowsOverlay,
+            }}
           />
         </Paper>
       </Box>

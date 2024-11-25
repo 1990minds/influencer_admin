@@ -53,8 +53,10 @@ function Index() {
   const handleDelete = (hotelId) => {
     if (window.confirm("Are you sure you want to delete this cafe?")) {
       dispatch(deleteHotel(hotelId));
+      
 
       console.log("Deleting cafe with ID:", hotelId);
+      window.location.reload()
     }
   };
 
@@ -117,14 +119,14 @@ function Index() {
                                 >
                                   Edit
                                 </Button>
-                                <Button
+                                {/* <Button
                                   variant="contained"
                                   color="secondary"
                                   onClick={() => handleDelete(hotel._id)}
                                   size="small"
                                 >
                                   Delete
-                                </Button>
+                                </Button> */}
                               </TableCell>
                             );
                           }

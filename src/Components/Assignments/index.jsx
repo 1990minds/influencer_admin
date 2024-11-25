@@ -12,10 +12,9 @@ import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import { Link, useNavigate } from "react-router-dom";
-import { Button, Typography } from "@mui/material";
+import { Button, Typography, Tooltip } from "@mui/material";
+import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import { useEffect, useState } from "react";
-import { Tooltip } from '@mui/material';
-import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchAllAssignments,
@@ -61,10 +60,16 @@ export default function EnhancedTable() {
 
   const [open, setOpen] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState(null);
+  const [sortOrder, setSortOrder] = useState("asc"); // State for sorting order
+  const [sortedAssignments, setSortedAssignments] = useState([]);
 
   useEffect(() => {
     dispatch(fetchAllAssignments());
   }, [dispatch]);
+
+  useEffect(() => {
+    setSortedAssignments([...assignments]); // Initialize sorted data
+  }, [assignments]);
 
   const handleRowClick = (assignment) => {
     setSelectedAssignment(assignment);
@@ -88,10 +93,18 @@ export default function EnhancedTable() {
         return "text-gray-600";
     }
   };
-  const HighlightText = styled("span")({
-    fontWeight: "bold",
-    color: "#3f51b5", // Blue color for emphasis
-  });
+
+  const sortByCollabStatus = () => {
+    const sortedData = [...assignments].sort((a, b) => {
+      const statusA = a.collab_status || "";
+      const statusB = b.collab_status || "";
+      return sortOrder === "asc"
+        ? statusA.localeCompare(statusB)
+        : statusB.localeCompare(statusA);
+    });
+    setSortOrder(sortOrder === "asc" ? "desc" : "asc"); // Toggle sort order
+    setSortedAssignments(sortedData);
+  };
 
   return (
     <div>
@@ -99,7 +112,7 @@ export default function EnhancedTable() {
         <Link to="assign">
           <button
             type="button"
-            className="text-white font-semibold bg-blue-700 hover:bg-blue-800 rounded-lg text-sm px-5 py-2.5 me-2 mb-2 hidden " //remove hidden in case if we need button
+            className="text-white font-semibold bg-blue-700 hover:bg-blue-800 rounded-lg text-sm px-5 py-2.5 me-2 mb-2 hidden"
           >
             + New Collab
           </button>
@@ -116,19 +129,30 @@ export default function EnhancedTable() {
               <StyledTableCell align="right">Cafe</StyledTableCell>
               <StyledTableCell align="right">Influencer</StyledTableCell>
               <StyledTableCell align="right">Date of Visit</StyledTableCell>
-              <StyledTableCell align="right">Collab Status</StyledTableCell>
+              <StyledTableCell align="right">Visit Status</StyledTableCell>
               <StyledTableCell align="right">Payment Status</StyledTableCell>
+              <StyledTableCell align="right">
+                Collaboration Status{" "}
+                <button
+                  size="small"
+                  onClick={sortByCollabStatus}
+                  sx={{ color: "white" }} 
+                  className="h-6 w-6 text-2xl font-semibold "
+                >
+                 ⇅
+                </button>
+              </StyledTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {assignments?.map((assignment) => (
+            {sortedAssignments?.map((assignment) => (
               <StyledTableRow
                 key={assignment._id}
                 onClick={() => handleRowClick(assignment)}
                 style={{ cursor: "pointer" }}
               >
                 <StyledTableCell component="th" scope="row">
-                  {assignment?._id.slice(0, 8).toUpperCase()}  {/* Display only the first 8 characters */}
+                  {assignment?._id.slice(0, 8).toUpperCase()}
                 </StyledTableCell>
                 <StyledTableCell align="right">
                   {assignment.cafe?.cafename || "N/A"}
@@ -139,11 +163,36 @@ export default function EnhancedTable() {
                 <StyledTableCell align="right">
                   {new Date(assignment.visit_date).toLocaleDateString()}
                 </StyledTableCell>
-                <StyledTableCell align="right" className={getStatusColor(assignment.all_status.visit_status ? "Visited" : "Not Visited")}>
+                <StyledTableCell align="right">
                   {assignment.all_status.visit_status ? "Visited" : "Not Visited"}
                 </StyledTableCell>
-                <StyledTableCell align="right" className={getStatusColor(assignment.amount_paid_status ? "Paid" : "Pending")}>
-                  {assignment.amount_paid_status ? "Paid" : "Pending"}
+                <StyledTableCell align="right">
+                  <span
+                    style={{
+                      backgroundColor: assignment.amount_paid_status
+                        ? "green"
+                        : "red",
+                      color: "white",
+                    }}
+                    className="p-1 rounded-md font-semibold"
+                  >
+                    {assignment.amount_paid_status
+                      ? "Paid"
+                      : "Payment Pending"}
+                  </span>
+                </StyledTableCell>
+                <StyledTableCell align="right">
+                  <span
+                    style={{
+                      backgroundColor:
+                        assignment.collab_status === "Completed"
+                          ? "green"
+                          : "red",
+                    }}
+                    className="rounded-md p-1 font-semibold text-white"
+                  >
+                    {assignment?.collab_status}
+                  </span>
                 </StyledTableCell>
               </StyledTableRow>
             ))}
